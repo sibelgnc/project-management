@@ -1,8 +1,5 @@
 package com.project.controller;
 
-
-
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,84 +35,75 @@ import com.project.service.ProjectService;
 import com.project.service.UserService;
 
 
-
 @Controller
 @RequestMapping("/projectManagement")
-public class ProjectController 
-{
-	@Autowired
-	private ProjectService projectService;
+public class ProjectController {
+    @Autowired
+    private ProjectService projectService;
 
-	@Autowired
-	private UserService userService;
-	@Autowired
-	private NoteService noteService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private NoteService noteService;
 
-	@RequestMapping(value={"/add"},method=RequestMethod.GET)
-	public String getProjectAdd(ModelMap model)
-	{
-		model.addAttribute("additionProject", new Project());
-		return "projectAdd";
-	}
+    @RequestMapping(value = {"/add"}, method = RequestMethod.GET)
+    public String getProjectAdd(ModelMap model) {
+        model.addAttribute("additionProject", new Project());
+        return "projectAdd";
+    }
 
-	@RequestMapping(value = "/projectAddition", method = RequestMethod.POST)
-	public String saveProject(@Valid @ModelAttribute("additionProject")Project project, BindingResult result,ModelMap model)
-	{
+    @RequestMapping(value = "/projectAddition", method = RequestMethod.POST)
+    public String saveProject(@Valid @ModelAttribute("additionProject") Project project, BindingResult result, ModelMap model) {
 		/*System.out.println("project name:"+project.getProjectName());
 		System.out.println("project date:"+project.getIssuedOn());*/
 
-		projectService.addProjectToUser(project, new User());
+        projectService.addProjectToUser(project, new User());
 
-		return "redirect:/projectManagement/add";
-
-
-	}
-	@RequestMapping(value="/list",method=RequestMethod.GET)
-	public String listProjects(ModelMap model)
-	{
-		//User user=userService.findUserByName("elidor");
-		//List<Project>projects=projectService.findProjectByUser(user);
-		Set<Project>projects=userService.findUserProject("elidor");
-		model.addAttribute("projects",projects);
-		System.out.println("project size:"+projects.size());
-		return "projectList";
-	}
-	@RequestMapping(value = { "/delete-{id}-project" }, method = RequestMethod.GET)
-	public String deleteProject(@PathVariable String id) 
-	{
-		projectService.deleteProjectById(Integer.parseInt(id));
-		return "redirect:/projectManagement/list";
-	}
+        return "redirect:/projectManagement/add";
 
 
+    }
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public String listProjects(ModelMap model) {
+        //User user=userService.findUserByName("elidor");
+        //List<Project>projects=projectService.findProjectByUser(user);
+        Set<Project> projects = userService.findUserProject("elidor");
+        model.addAttribute("projects", projects);
+        System.out.println("project size:" + projects.size());
+        return "projectList";
+    }
+
+    @RequestMapping(value = {"/delete-{id}-project"}, method = RequestMethod.GET)
+    public String deleteProject(@PathVariable String id) {
+        projectService.deleteProjectById(Integer.parseInt(id));
+        return "redirect:/projectManagement/list";
+    }
 
 
-	@RequestMapping(value = "/edit-{id}-project" , method = RequestMethod.GET)
-	public String editProject(@PathVariable String id, ModelMap model) 
-	{
-		Project project=projectService.findProjectById(Integer.parseInt(id));
-		System.out.println("projact name:"+project.getProjectName());
-		model.addAttribute("updatedProject",project);
+    @RequestMapping(value = "/edit-{id}-project", method = RequestMethod.GET)
+    public String editProject(@PathVariable String id, ModelMap model) {
+        Project project = projectService.findProjectById(Integer.parseInt(id));
+        System.out.println("projact name:" + project.getProjectName());
+        model.addAttribute("updatedProject", project);
 
-		return "projectUpdate";
-	}
-	
-	@RequestMapping(value = "/notes-{id}-project" , method = RequestMethod.GET)
-	public String projectNoteList(@PathVariable String id, ModelMap model) 
-	{
-		Project project=projectService.findProjectById(Integer.parseInt(id));
-		Note not=new Note();
-		not.setProjectNotes(project);
+        return "projectUpdate";
+    }
 
-		model.addAttribute("additionNote",not);
-		
-		
-		
-		model.addAttribute("notes",project.getNotes());
+    @RequestMapping(value = "/notes-{id}-project", method = RequestMethod.GET)
+    public String projectNoteList(@PathVariable String id, ModelMap model) {
+        Project project = projectService.findProjectById(Integer.parseInt(id));
+        Note not = new Note();
+        not.setProjectNotes(project);
+
+        model.addAttribute("additionNote", not);
 
 
-		return "projectNoteList";
-	}
+        model.addAttribute("notes", project.getNotes());
+
+
+        return "projectNoteList";
+    }
 	
 	/*@RequestMapping(value = "/notes-{id}-project" , method = RequestMethod.GET)
 	public String projectNoteList(@PathVariable String id, ModelMap model) 
@@ -136,40 +124,39 @@ public class ProjectController
 		return "listDeneme";
 	}*/
 
-     
-	@RequestMapping(value = "/update" , method = RequestMethod.POST)
-	public String updateProject(@Valid @ModelAttribute("updatedProject")Project project, BindingResult result,
-			ModelMap model) 
-	{
-		System.out.println("projact name:"+project.getProjectName());
-		System.out.println("proje id:"+project.getId());
-		projectService.updateProject(project);
 
-		return "redirect:/projectManagement/list";
-	}
-	@RequestMapping(value = "/noteAdd" , method = RequestMethod.POST)
-	public String addNoteProject(@Valid @ModelAttribute("additionNote")Note note, BindingResult result,
-			ModelMap model) throws ParseException 
-	{
-		Project project=projectService.findProjectByName(note.getProjectNotes().getProjectName());
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    public String updateProject(@Valid @ModelAttribute("updatedProject") Project project, BindingResult result,
+                                ModelMap model) {
+        System.out.println("projact name:" + project.getProjectName());
+        System.out.println("proje id:" + project.getId());
+        projectService.updateProject(project);
 
-		Note not=new Note();
-		not.setProjectNotes(project);
-		project.getNotes().add(note);
-		note.setProjectNotes(project);
-		//Date date = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
-		
-	    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-	    Date date = formatter.parse(LocalDate.now().toString());
-		
-		note.setNoteDate(date); 
-		
-		noteService.saveNote(note);
+        return "redirect:/projectManagement/list";
+    }
 
-		model.addAttribute("additionNote",not);
-		model.addAttribute("notes",project.getNotes());
-		return "projectNoteList";
-	}
+    @RequestMapping(value = "/noteAdd", method = RequestMethod.POST)
+    public String addNoteProject(@Valid @ModelAttribute("additionNote") Note note, BindingResult result,
+                                 ModelMap model) throws ParseException {
+        Project project = projectService.findProjectByName(note.getProjectNotes().getProjectName());
+
+        Note not = new Note();
+        not.setProjectNotes(project);
+        project.getNotes().add(note);
+        note.setProjectNotes(project);
+        //Date date = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = formatter.parse(LocalDate.now().toString());
+
+        note.setNoteDate(date);
+
+        noteService.saveNote(note);
+
+        model.addAttribute("additionNote", not);
+        model.addAttribute("notes", project.getNotes());
+        return "projectNoteList";
+    }
 
 	/*@InitBinder
 	protected void initBinder(WebDataBinder binder) {
@@ -183,19 +170,19 @@ public class ProjectController
 		dateFormat.setLenient(true);
 		binder.registerCustomEditor(Date.class, "dateNote",new CustomDateEditor(dateFormat, true));
 	}*/
-	
-	@ModelAttribute("noteForm")
-	public NoteForm getNoteForm()
-	{
-		
-		return new NoteForm();
-	}
-	@RequestMapping("/listDeneme")
-	public @ResponseBody String someAction(@ModelAttribute("noteForm")NoteForm notes,Map<String, Object> map,HttpServletRequest request) 
-	{
-            System.out.println("noteForm[0] :"+notes.getNotes().get(0).getContent());
-	
-	 
-	        return "listDeneme";
-	}
+
+    @ModelAttribute("noteForm")
+    public NoteForm getNoteForm() {
+
+        return new NoteForm();
+    }
+
+    @RequestMapping("/listDeneme")
+    public @ResponseBody
+    String someAction(@ModelAttribute("noteForm") NoteForm notes, Map<String, Object> map, HttpServletRequest request) {
+        System.out.println("noteForm[0] :" + notes.getNotes().get(0).getContent());
+
+
+        return "listDeneme";
+    }
 }
