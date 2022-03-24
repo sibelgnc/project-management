@@ -1,0 +1,50 @@
+/*
+	Sýfýrlama
+*/
+* {
+	padding: 0; margin: 0; list-style: none; border: 0; text-decoration: none; font-family: Arial; font-size: 14px; line-height: 21px
+}
+
+.menu {
+	overflow: hidden;
+	background-color: #111
+}
+.menu ul li {
+	float: left
+}
+.menu ul li a {
+	display: block;
+	padding: 10px 20px;
+	color: #fff;
+	border-right: 1px solid #555
+}
+.menu ul li a:hover {
+	background-color: #555
+}
+.menuAc {
+	background-color: #fa6585;
+	padding: 10px;
+	color: #fff;
+	font-weight: bold;
+	cursor: pointer;
+	display: none
+}
+.content {
+	border: 1px solid #ddd;
+	padding: 10px;
+	margin: 10px
+}
+.footer {
+	color: #999;
+	text-align: center
+}
+
+@media (max-width: 700px) {
+	.menuAc { display: block }
+	.menu ul { display: none }
+	.menu ul li { float: none }
+	.menu ul li a { border-right: none; border-bottom: 1px solid #555 }
+}
+@media (min-width: 700px){
+	.menu ul { display: block!important }
+}
